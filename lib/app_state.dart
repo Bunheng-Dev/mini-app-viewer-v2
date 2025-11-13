@@ -48,6 +48,7 @@ class AppState extends ChangeNotifier {
   String _titleInput = '';
   String _colorInput = '';
   List<HistoryItem> _history = [];
+  bool _showHeader = true;
 
   // Getters
   String? get url => _url;
@@ -58,6 +59,7 @@ class AppState extends ChangeNotifier {
   String get titleInput => _titleInput;
   String get colorInput => _colorInput;
   List<HistoryItem> get history => _history;
+  bool get showHeader => _showHeader;
 
   // Initialize and load history from shared preferences
   Future<void> loadHistory() async {
@@ -153,6 +155,12 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Toggle show header
+  void toggleShowHeader(bool value) {
+    _showHeader = value;
+    notifyListeners();
+  }
+
   // Extract domain name from URL for title
   String _getDomainTitle(String url) {
     try {
@@ -200,6 +208,7 @@ class AppState extends ChangeNotifier {
     _colorInput = '';
     _customTitle = 'Mini App';
     _customColor = Colors.blue;
+    _showHeader = true;
     notifyListeners();
   }
 

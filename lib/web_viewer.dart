@@ -116,7 +116,7 @@ class _WebViewPageState extends State<WebViewPage> {
     return Consumer<AppState>(
       builder: (context, appState, child) {
         return Scaffold(
-          appBar: AppBar(
+          appBar: appState.showHeader ? AppBar(
             titleSpacing: 0,
             toolbarHeight: 45,
             actions: [
@@ -146,7 +146,7 @@ class _WebViewPageState extends State<WebViewPage> {
                 letterSpacing: 0.3,
               ),
             ),
-          ),
+          ) : null,
           body: SafeArea(child: WebViewWidget(controller: _controller)),
         );
       },

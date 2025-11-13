@@ -145,24 +145,49 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     const SizedBox(height: 40),
 
-                                    // Title input
-                                    TextField(
-                                      controller: _titleController,
-                                      decoration: InputDecoration(
-                                        labelText: 'AppBar Title',
-                                        labelStyle: const TextStyle(
+                                    // Show Header Checkbox
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                      child: CheckboxListTile(
+                                        checkboxScaleFactor: 1.2,
+                                        checkColor: Colors.white,
+                                        side: BorderSide(
+                                          width: 2,
                                           color: Colors.blueAccent,
                                         ),
-                                        hintText: 'e.g. My Mini App',
-                                        filled: true,
-                                        fillColor: Colors.grey.shade100,
+                                        splashRadius: 30,
+                                        value: appState.showHeader,
+                                        onChanged: (value) {
+                                          appState.toggleShowHeader(
+                                            value ?? true,
+                                          );
+                                        },
+                                        title: Text(
+                                          'Show Header',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.blueAccent,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          'Display app bar with title and controls',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade500,
+                                          ),
+                                        ),
+                                        activeColor: Colors.blueAccent,
                                         contentPadding:
                                             const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 12,
+                                              horizontal: 4,
+                                              vertical: 0,
                                             ),
-                                        border: OutlineInputBorder(
-                                          borderSide: BorderSide.none,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
                                             50,
                                           ),
@@ -171,31 +196,59 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     const SizedBox(height: 20),
 
-                                    // Color input
-                                    TextField(
-                                      controller: _colorController,
-                                      decoration: InputDecoration(
-                                        labelText: 'AppBar Color',
-                                        hintText: 'e.g. #RRGGBB',
-                                        labelStyle: const TextStyle(
-                                          color: Colors.blueAccent,
-                                        ),
-                                        filled: true,
-                                        fillColor: Colors.grey.shade100,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 12,
+                                    // Title input
+                                    if (appState.showHeader) ...[
+                                      TextField(
+                                        controller: _titleController,
+                                        decoration: InputDecoration(
+                                          labelText: 'AppBar Title',
+                                          labelStyle: const TextStyle(
+                                            color: Colors.blueAccent,
+                                          ),
+                                          hintText: 'e.g. My Mini App',
+                                          filled: true,
+                                          fillColor: Colors.grey.shade100,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 12,
+                                              ),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius: BorderRadius.circular(
+                                              50,
                                             ),
-                                        border: OutlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius: BorderRadius.circular(
-                                            50,
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 20),
+                                      const SizedBox(height: 20),
+
+                                      // Color input
+                                      TextField(
+                                        controller: _colorController,
+                                        decoration: InputDecoration(
+                                          labelText: 'AppBar Color',
+                                          hintText: 'e.g. #RRGGBB',
+                                          labelStyle: const TextStyle(
+                                            color: Colors.blueAccent,
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.grey.shade100,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 12,
+                                              ),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius: BorderRadius.circular(
+                                              50,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                    ],
 
                                     // URL input
                                     TextField(
