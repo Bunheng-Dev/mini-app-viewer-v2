@@ -1,6 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class TelegramUser {
+  final int id;
+  final String username;
+  final String firstName;
+  final String lastName;
+  final String photoUrl;
+  final String languageCode;
+
+  TelegramUser({
+    required this.id,
+    required this.username,
+    required this.firstName,
+    required this.lastName,
+    required this.photoUrl,
+    required this.languageCode,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'username': username,
+      'first_name': firstName,
+      'last_name': lastName,
+      'photo_url': photoUrl,
+      'language_code': languageCode,
+    };
+  }
+}
+
 class HistoryItem {
   final String url;
   final String title;
@@ -49,6 +78,17 @@ class AppState extends ChangeNotifier {
   String _colorInput = '';
   List<HistoryItem> _history = [];
   bool _showHeader = true;
+  String? _currentMiniApp; // Track which mini app is being opened
+
+  // Static Telegram user credentials
+  final TelegramUser telegramUser = TelegramUser(
+    id: 123456789,
+    username: 'nealika',
+    firstName: 'Nealika',
+    lastName: 'Tester',
+    photoUrl: 'https://i.pravatar.cc/150?img=12',
+    languageCode: 'en',
+  );
 
   // Getters
   String? get url => _url;
@@ -60,6 +100,7 @@ class AppState extends ChangeNotifier {
   String get colorInput => _colorInput;
   List<HistoryItem> get history => _history;
   bool get showHeader => _showHeader;
+  String? get currentMiniApp => _currentMiniApp;
 
   // Initialize and load history from shared preferences
   Future<void> loadHistory() async {
@@ -75,6 +116,10 @@ class AppState extends ChangeNotifier {
             };
             return HistoryItem.fromJson(json);
           }).toList();
+
+      // Load showHeader setting (default to true if not set)
+      _showHeader = prefs.getBool('showHeader') ?? true;
+
       notifyListeners();
     } catch (e) {
       print('Error loading history: $e');
@@ -156,8 +201,14 @@ class AppState extends ChangeNotifier {
   }
 
   // Toggle show header
-  void toggleShowHeader(bool value) {
+  Future<void> toggleShowHeader(bool value) async {
     _showHeader = value;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('showHeader', value);
+    } catch (e) {
+      print('Error saving showHeader setting: $e');
+    }
     notifyListeners();
   }
 
@@ -184,13 +235,14 @@ class AppState extends ChangeNotifier {
   }
 
   // Validate and load URL
-  void loadUrl(String url, String title, String color) {
+  void loadUrl(String url, String title, String color, {String? miniAppName}) {
     if (_isValidUrl(url)) {
       _url = url;
       _customTitle =
           title.trim().isNotEmpty ? title.trim() : _getDomainTitle(url);
       _customColor = _parseColor(color.trim());
       _isLoading = true;
+      _currentMiniApp = miniAppName;
 
       // Add to history
       _addToHistory(url, _customTitle);
@@ -208,7 +260,8 @@ class AppState extends ChangeNotifier {
     _colorInput = '';
     _customTitle = 'Mini App';
     _customColor = Colors.blue;
-    _showHeader = true;
+    // Don't reset _showHeader - keep user's preference
+    _currentMiniApp = null;
     notifyListeners();
   }
 

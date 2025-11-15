@@ -1,66 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mini_app_viewer/web_viewer.dart';
 import 'package:mini_app_viewer/app_state.dart';
 import 'package:mini_app_viewer/history_screen.dart';
+import 'package:mini_app_viewer/widgets/mini_app_grid.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _urlController = TextEditingController();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _colorController = TextEditingController();
-
-  bool _isValidUrl(String url) {
-    final uri = Uri.tryParse(url);
-    return uri != null &&
-        (uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https'));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _urlController.addListener(_onUrlChanged);
-  }
-
-  @override
-  void dispose() {
-    _urlController.removeListener(_onUrlChanged);
-    _urlController.dispose();
-    _titleController.dispose();
-    _colorController.dispose();
-    super.dispose();
-  }
-
-  void _onUrlChanged() {
-    final input = _urlController.text.trim();
-    if (_isValidUrl(input)) {
-      final appState = Provider.of<AppState>(context, listen: false);
-      appState.loadUrl(
-        input,
-        _titleController.text.trim(),
-        _colorController.text.trim(),
-      );
-    }
-  }
-
-  Future<void> _pasteFromClipboard() async {
-    final data = await Clipboard.getData(Clipboard.kTextPlain);
-    final pastedText = data?.text?.trim() ?? '';
-    if (pastedText.isNotEmpty) {
-      _urlController.text = pastedText;
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Clipboard is empty")));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,195 +68,35 @@ class _HomeScreenState extends State<HomeScreen> {
           body:
               appState.url == null
                   ? SafeArea(
-                    child: LayoutBuilder(
-                      builder:
-                          (context, constraints) => SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.all(20),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight,
-                              ),
-                              child: IntrinsicHeight(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    const SizedBox(height: 20),
-                                    Image.asset(
-                                      'assets/img/mini_app_banner.png',
-                                      width: double.infinity,
-                                      height: 150,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    const SizedBox(height: 40),
-
-                                    // Show Header Checkbox
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        borderRadius: BorderRadius.circular(25),
-                                      ),
-                                      child: CheckboxListTile(
-                                        checkboxScaleFactor: 1.2,
-                                        checkColor: Colors.white,
-                                        side: BorderSide(
-                                          width: 2,
-                                          color: Colors.blueAccent,
-                                        ),
-                                        splashRadius: 30,
-                                        value: appState.showHeader,
-                                        onChanged: (value) {
-                                          appState.toggleShowHeader(
-                                            value ?? true,
-                                          );
-                                        },
-                                        title: Text(
-                                          'Show Header',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.blueAccent,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          'Display app bar with title and controls',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade500,
-                                          ),
-                                        ),
-                                        activeColor: Colors.blueAccent,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 4,
-                                              vertical: 0,
-                                            ),
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            50,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-
-                                    // Title input
-                                    if (appState.showHeader) ...[
-                                      TextField(
-                                        controller: _titleController,
-                                        decoration: InputDecoration(
-                                          labelText: 'AppBar Title',
-                                          labelStyle: const TextStyle(
-                                            color: Colors.blueAccent,
-                                          ),
-                                          hintText: 'e.g. My Mini App',
-                                          filled: true,
-                                          fillColor: Colors.grey.shade100,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                horizontal: 16,
-                                                vertical: 12,
-                                              ),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.circular(
-                                              50,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-
-                                      // Color input
-                                      TextField(
-                                        controller: _colorController,
-                                        decoration: InputDecoration(
-                                          labelText: 'AppBar Color',
-                                          hintText: 'e.g. #RRGGBB',
-                                          labelStyle: const TextStyle(
-                                            color: Colors.blueAccent,
-                                          ),
-                                          filled: true,
-                                          fillColor: Colors.grey.shade100,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                horizontal: 16,
-                                                vertical: 12,
-                                              ),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.circular(
-                                              50,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                    ],
-
-                                    // URL input
-                                    TextField(
-                                      controller: _urlController,
-                                      decoration: InputDecoration(
-                                        labelText: 'Mini App URL',
-                                        labelStyle: const TextStyle(
-                                          color: Color(0xFF448AFF),
-                                        ),
-                                        hintText: 'https://example.com',
-                                        filled: true,
-                                        fillColor: Colors.grey.shade100,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 10,
-                                            ),
-                                        border: OutlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius: BorderRadius.circular(
-                                            50,
-                                          ),
-                                        ),
-                                        suffixIcon: Padding(
-                                          padding: const EdgeInsets.only(
-                                            right: 8,
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: _pasteFromClipboard,
-                                            child: Container(
-                                              width: 28,
-                                              height: 28,
-                                              decoration: const BoxDecoration(
-                                                color: Color.fromARGB(
-                                                  26,
-                                                  11,
-                                                  96,
-                                                  233,
-                                                ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.paste,
-                                                color: Colors.blueAccent,
-                                                size: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        suffixIconConstraints:
-                                            const BoxConstraints(
-                                              minHeight: 32,
-                                              minWidth: 32,
-                                            ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 50),
-                                  ],
-                                ),
-                              ),
-                            ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 20),
+                          Image.asset(
+                            'assets/img/mini_app_banner.png',
+                            width: double.infinity,
+                            height: 150,
+                            fit: BoxFit.cover,
                           ),
+                          const SizedBox(height: 15),
+
+                          // Text(
+                          //   'Select Mini App',
+                          //   style: TextStyle(
+                          //     fontSize: 20,
+                          //     fontWeight: FontWeight.w600,
+                          //     color: Colors.grey.shade800,
+                          //   ),
+                          //   textAlign: TextAlign.center,
+                          // ),
+                          // const SizedBox(height: 20),
+
+                          // Grid of Mini Apps
+                          const Expanded(child: MiniAppGrid()),
+                        ],
+                      ),
                     ),
                   )
                   : Stack(
