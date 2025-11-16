@@ -1,72 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-class TelegramUser {
-  final int id;
-  final String username;
-  final String firstName;
-  final String lastName;
-  final String photoUrl;
-  final String languageCode;
-
-  TelegramUser({
-    required this.id,
-    required this.username,
-    required this.firstName,
-    required this.lastName,
-    required this.photoUrl,
-    required this.languageCode,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'username': username,
-      'first_name': firstName,
-      'last_name': lastName,
-      'photo_url': photoUrl,
-      'language_code': languageCode,
-    };
-  }
-}
-
-class HistoryItem {
-  final String url;
-  final String title;
-  final DateTime timestamp;
-
-  HistoryItem({
-    required this.url,
-    required this.title,
-    required this.timestamp,
-  });
-
-  // Get favicon URL for the domain
-  String get faviconUrl {
-    try {
-      final uri = Uri.parse(url);
-      return 'https://www.google.com/s2/favicons?domain=${uri.host}&sz=64';
-    } catch (e) {
-      return '';
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'url': url,
-      'title': title,
-      'timestamp': timestamp.toIso8601String(),
-    };
-  }
-
-  factory HistoryItem.fromJson(Map<String, dynamic> json) {
-    return HistoryItem(
-      url: json['url'],
-      title: json['title'],
-      timestamp: DateTime.parse(json['timestamp']),
-    );
-  }
-}
+import 'package:mini_app_viewer/data/mock_data.dart';
+import 'package:mini_app_viewer/models/telegram_user.dart';
+import 'package:mini_app_viewer/models/aba_profile.dart';
+import 'package:mini_app_viewer/models/aba_account.dart';
+import 'package:mini_app_viewer/models/history_item.dart';
 
 class AppState extends ChangeNotifier {
   String? _url;
@@ -80,15 +18,10 @@ class AppState extends ChangeNotifier {
   bool _showHeader = true;
   String? _currentMiniApp; // Track which mini app is being opened
 
-  // Static Telegram user credentials
-  final TelegramUser telegramUser = TelegramUser(
-    id: 123456789,
-    username: 'nealika',
-    firstName: 'Nealika',
-    lastName: 'Tester',
-    photoUrl: 'https://i.pravatar.cc/150?img=12',
-    languageCode: 'en',
-  );
+  // Editable data initialized from mock_data.dart
+  TelegramUser telegramUser = mockTelegramUser;
+  ABAProfile abaProfile = mockABAProfile;
+  ABAAccount abaAccount = mockABAAccount;
 
   // Getters
   String? get url => _url;
@@ -119,6 +52,84 @@ class AppState extends ChangeNotifier {
 
       // Load showHeader setting (default to true if not set)
       _showHeader = prefs.getBool('showHeader') ?? true;
+
+      // Load Telegram user data
+      final telegramJson = prefs.getString('telegramUser');
+      if (telegramJson != null) {
+        try {
+          final data = Map<String, dynamic>.from(
+            Uri.splitQueryString(telegramJson),
+          );
+          telegramUser = TelegramUser(
+            id: int.parse(data['id'] ?? '${mockTelegramUser.id}'),
+            username: data['username'] ?? mockTelegramUser.username,
+            firstName: data['firstName'] ?? mockTelegramUser.firstName,
+            lastName: data['lastName'] ?? mockTelegramUser.lastName,
+            photoUrl: data['photoUrl'] ?? mockTelegramUser.photoUrl,
+            languageCode: data['languageCode'] ?? mockTelegramUser.languageCode,
+          );
+        } catch (e) {
+          print('Error parsing Telegram user data: $e');
+        }
+      }
+
+      // Load ABA profile data
+      final abaProfileJson = prefs.getString('abaProfile');
+      if (abaProfileJson != null) {
+        try {
+          final data = Map<String, dynamic>.from(
+            Uri.splitQueryString(abaProfileJson),
+          );
+          abaProfile = ABAProfile(
+            appId: data['appId'] ?? mockABAProfile.appId,
+            firstName: data['firstName'] ?? mockABAProfile.firstName,
+            middleName: data['middleName'] ?? mockABAProfile.middleName,
+            lastName: data['lastName'] ?? mockABAProfile.lastName,
+            fullName: data['fullName'] ?? mockABAProfile.fullName,
+            sex: data['sex'] ?? mockABAProfile.sex,
+            dobShort: data['dobShort'] ?? mockABAProfile.dobShort,
+            nationality: data['nationality'] ?? mockABAProfile.nationality,
+            phone: data['phone'] ?? mockABAProfile.phone,
+            email: data['email'] ?? mockABAProfile.email,
+            lang: data['lang'] ?? mockABAProfile.lang,
+            id: data['id'] ?? mockABAProfile.id,
+            appVersion: data['appVersion'] ?? mockABAProfile.appVersion,
+            osVersion: data['osVersion'] ?? mockABAProfile.osVersion,
+            address: data['address'] ?? mockABAProfile.address,
+            city: data['city'] ?? mockABAProfile.city,
+            country: data['country'] ?? mockABAProfile.country,
+            dobFull: data['dobFull'] ?? mockABAProfile.dobFull,
+            nidNumber: data['nidNumber'] ?? mockABAProfile.nidNumber,
+            nidType: data['nidType'] ?? mockABAProfile.nidType,
+            nidExpiryDate:
+                data['nidExpiryDate'] ?? mockABAProfile.nidExpiryDate,
+            nidDoc: data['nidDoc'] ?? mockABAProfile.nidDoc,
+            occupation: data['occupation'] ?? mockABAProfile.occupation,
+            addrCode: data['addrCode'] ?? mockABAProfile.addrCode,
+            secretKey: data['secretKey'] ?? mockABAProfile.secretKey,
+          );
+        } catch (e) {
+          print('Error parsing ABA profile data: $e');
+        }
+      }
+
+      // Load ABA account data
+      final abaAccountJson = prefs.getString('abaAccount');
+      if (abaAccountJson != null) {
+        try {
+          final data = Map<String, dynamic>.from(
+            Uri.splitQueryString(abaAccountJson),
+          );
+          abaAccount = ABAAccount(
+            accountName: data['accountName'] ?? mockABAAccount.accountName,
+            accountNumber:
+                data['accountNumber'] ?? mockABAAccount.accountNumber,
+            currency: data['currency'] ?? mockABAAccount.currency,
+          );
+        } catch (e) {
+          print('Error parsing ABA account data: $e');
+        }
+      }
 
       notifyListeners();
     } catch (e) {
@@ -302,5 +313,93 @@ class AppState extends ChangeNotifier {
       }
     } catch (_) {}
     return Colors.blue;
+  }
+
+  // Update Telegram user data
+  Future<void> updateTelegramUser(TelegramUser newUser) async {
+    telegramUser = newUser;
+
+    // Save to SharedPreferences
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final data = {
+        'id': newUser.id.toString(),
+        'username': newUser.username,
+        'firstName': newUser.firstName,
+        'lastName': newUser.lastName,
+        'photoUrl': newUser.photoUrl,
+        'languageCode': newUser.languageCode,
+      };
+      final queryString = Uri(queryParameters: data).query;
+      await prefs.setString('telegramUser', queryString);
+    } catch (e) {
+      print('Error saving Telegram user data: $e');
+    }
+
+    notifyListeners();
+  }
+
+  // Update ABA profile data
+  Future<void> updateABAProfile(ABAProfile newProfile) async {
+    abaProfile = newProfile;
+
+    // Save to SharedPreferences
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final data = {
+        'appId': newProfile.appId,
+        'firstName': newProfile.firstName,
+        'middleName': newProfile.middleName,
+        'lastName': newProfile.lastName,
+        'fullName': newProfile.fullName,
+        'sex': newProfile.sex,
+        'dobShort': newProfile.dobShort,
+        'nationality': newProfile.nationality,
+        'phone': newProfile.phone,
+        'email': newProfile.email,
+        'lang': newProfile.lang,
+        'id': newProfile.id,
+        'appVersion': newProfile.appVersion,
+        'osVersion': newProfile.osVersion,
+        'address': newProfile.address,
+        'city': newProfile.city,
+        'country': newProfile.country,
+        'dobFull': newProfile.dobFull,
+        'nidNumber': newProfile.nidNumber,
+        'nidType': newProfile.nidType,
+        'nidExpiryDate': newProfile.nidExpiryDate,
+        'nidDoc': newProfile.nidDoc,
+        'occupation': newProfile.occupation,
+        'addrCode': newProfile.addrCode,
+        'secretKey': newProfile.secretKey,
+      };
+      final queryString = Uri(queryParameters: data).query;
+      await prefs.setString('abaProfile', queryString);
+    } catch (e) {
+      print('Error saving ABA profile data: $e');
+    }
+
+    notifyListeners();
+  }
+
+  // Update ABA account data
+  Future<void> updateABAAccount(ABAAccount newAccount) async {
+    abaAccount = newAccount;
+
+    // Save to SharedPreferences
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final data = {
+        'accountName': newAccount.accountName,
+        'accountNumber': newAccount.accountNumber,
+        'currency': newAccount.currency,
+      };
+      final queryString = Uri(queryParameters: data).query;
+      await prefs.setString('abaAccount', queryString);
+    } catch (e) {
+      print('Error saving ABA account data: $e');
+    }
+
+    notifyListeners();
   }
 }

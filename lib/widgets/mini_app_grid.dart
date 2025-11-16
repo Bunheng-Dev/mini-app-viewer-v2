@@ -284,16 +284,18 @@ class _MiniAppGridState extends State<MiniAppGrid> {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 15,
+        childAspectRatio: 1 / 0.9,
       ),
+      physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
       itemCount: _miniApps.length,
       itemBuilder: (context, index) {
         final app = _miniApps[index];
         return InkWell(
           onTap: () => _showMiniAppDialog(app),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(25),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mini_app_viewer/app_state.dart';
+import 'package:mini_app_viewer/screens/edit_telegram_screen.dart';
+import 'package:mini_app_viewer/screens/edit_aba_screen.dart';
+import 'package:mini_app_viewer/widgets/setting_card.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -21,6 +24,7 @@ class SettingsScreen extends StatelessWidget {
                 letterSpacing: 0.3,
               ),
             ),
+            scrolledUnderElevation: 0,
             centerTitle: true,
             backgroundColor: Colors.white,
             elevation: 0,
@@ -32,6 +36,7 @@ class SettingsScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           body: SafeArea(
             child: ListView(
+              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(20),
               children: [
                 const SizedBox(height: 10),
@@ -52,10 +57,7 @@ class SettingsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: Colors.grey.shade200,
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: Colors.grey.shade200, width: 1.5),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.shade100,
@@ -92,6 +94,51 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
+                // Static Data Settings Section
+                Text(
+                  'Data Settings',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Edit Telegram Data
+                SettingCard(
+                  imagePath: 'assets/img/tg.webp',
+                  backgroundColor: Colors.grey.shade400,
+                  title: 'Edit Telegram Profile',
+                  subtitle: 'Configure Telegram user credentials',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditTelegramScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // Edit ABA Profile
+                SettingCard(
+                  imagePath: 'assets/img/aba.webp',
+                  backgroundColor: Colors.grey.shade400,
+                  title: 'Edit ABA Profile',
+                  subtitle: 'Configure ABA user profile data',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditABAScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 30),
+
                 // About Section
                 Text(
                   'About',
@@ -108,10 +155,7 @@ class SettingsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: Colors.grey.shade200,
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: Colors.grey.shade200, width: 1.5),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.shade100,
@@ -149,7 +193,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Version 1.0.0',
+                        'Version 2.1.4',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
@@ -157,7 +201,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'A Flutter app for testing mini apps with Telegram authentication and dynamic header customization.',
+                        'A Flutter app for testing mini apps with Many App authentication and dynamic header customization.',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade700,
@@ -174,6 +218,4 @@ class SettingsScreen extends StatelessWidget {
       },
     );
   }
-
-
 }

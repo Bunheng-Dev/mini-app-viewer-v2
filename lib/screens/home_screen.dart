@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini_app_viewer/web_viewer.dart';
 import 'package:mini_app_viewer/app_state.dart';
-import 'package:mini_app_viewer/history_screen.dart';
+import 'package:mini_app_viewer/screens/history_screen.dart';
 import 'package:mini_app_viewer/widgets/mini_app_grid.dart';
 import 'package:provider/provider.dart';
 
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
                           Image.asset(
                             'assets/img/mini_app_banner.png',
                             width: double.infinity,
-                            height: 150,
+                            height: 140,
                             fit: BoxFit.cover,
                           ),
                           const SizedBox(height: 15),

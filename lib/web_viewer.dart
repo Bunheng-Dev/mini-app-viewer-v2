@@ -71,6 +71,11 @@ class _WebViewPageState extends State<WebViewPage> {
                   await Future.delayed(const Duration(milliseconds: 100));
                   await _injectTelegramUserData(appState);
                 }
+                // Inject ABA data immediately when page starts loading
+                if (appState.currentMiniApp == 'ABA') {
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  await _injectABAData(appState);
+                }
               },
               onPageFinished: (url) async {
                 appState.setLoading(false);
@@ -82,6 +87,15 @@ class _WebViewPageState extends State<WebViewPage> {
                   await _injectTelegramUserData(appState);
                   await Future.delayed(const Duration(milliseconds: 1000));
                   await _injectTelegramUserData(appState);
+                }
+
+                // Inject ABA data multiple times to ensure it's available
+                if (appState.currentMiniApp == 'ABA') {
+                  await _injectABAData(appState);
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  await _injectABAData(appState);
+                  await Future.delayed(const Duration(milliseconds: 1000));
+                  await _injectABAData(appState);
                 }
 
                 // Start monitoring title and color changes
@@ -129,6 +143,13 @@ class _WebViewPageState extends State<WebViewPage> {
       _controller.loadRequest(Uri.parse(appState.url!)).then((_) async {
         await Future.delayed(const Duration(milliseconds: 200));
         await _injectTelegramUserData(appState);
+      });
+    }
+    // For ABA mini apps, inject the user data before loading
+    else if (appState.currentMiniApp == 'ABA') {
+      _controller.loadRequest(Uri.parse(appState.url!)).then((_) async {
+        await Future.delayed(const Duration(milliseconds: 200));
+        await _injectABAData(appState);
       });
     } else {
       _controller.loadRequest(Uri.parse(appState.url!));
@@ -328,6 +349,93 @@ class _WebViewPageState extends State<WebViewPage> {
       print('✅ Telegram user data injected for user: ${user.username}');
     } catch (e) {
       print('❌ Error injecting Telegram user data: $e');
+    }
+  }
+
+  Future<void> _injectABAData(AppState appState) async {
+    try {
+      final profile = appState.abaProfile;
+      final account = appState.abaAccount;
+
+      // Create ABA bridge with getProfile and getDefaultAccount handlers
+      final script = '''
+        (function() {
+          console.log("=== Injecting ABA Bridge ===");
+          
+          // Create ABA bridge object
+          window.ABA = window.ABA || {};
+          
+          // Store profile and account data
+          window.ABA._profileData = {
+            appId: "${profile.appId}",
+            firstName: "${profile.firstName}",
+            middleName: "${profile.middleName}",
+            lastName: "${profile.lastName}",
+            fullName: "${profile.fullName}",
+            sex: "${profile.sex}",
+            dobShort: "${profile.dobShort}",
+            nationality: "${profile.nationality}",
+            phone: "${profile.phone}",
+            email: "${profile.email}",
+            lang: "${profile.lang}",
+            id: "${profile.id}",
+            appVersion: "${profile.appVersion}",
+            osVersion: "${profile.osVersion}",
+            address: "${profile.address}",
+            city: "${profile.city}",
+            country: "${profile.country}",
+            dobFull: "${profile.dobFull}",
+            nidNumber: "${profile.nidNumber}",
+            nidType: "${profile.nidType}",
+            nidExpiryDate: "${profile.nidExpiryDate}",
+            nidDoc: "${profile.nidDoc}",
+            occupation: "${profile.occupation}",
+            addrCode: "${profile.addrCode}",
+            secret_key: "${profile.secretKey}"
+          };
+          
+          window.ABA._accountData = {
+            accountName: "${account.accountName}",
+            accountNumber: "${account.accountNumber}",
+            currency: "${account.currency}"
+          };
+          
+          // getProfile handler
+          window.ABA.getProfile = function(callback) {
+            console.log("✅ ABA getProfile called");
+            if (typeof callback === 'function') {
+              callback(window.ABA._profileData);
+            }
+            return window.ABA._profileData;
+          };
+          
+          // getDefaultAccount handler
+          window.ABA.getDefaultAccount = function(callback) {
+            console.log("✅ ABA getDefaultAccount called");
+            const payload = {
+              currency: "USD"
+            };
+            if (typeof callback === 'function') {
+              callback(payload, window.ABA._accountData);
+            }
+            return window.ABA._accountData;
+          };
+          
+          console.log("✅ ABA Bridge injected successfully!");
+          console.log("Available methods:");
+          console.log("  - window.ABA.getProfile(callback)");
+          console.log("  - window.ABA.getDefaultAccount(callback)");
+          console.log("Profile data:", JSON.stringify(window.ABA._profileData));
+          console.log("Account data:", JSON.stringify(window.ABA._accountData));
+        })();
+      ''';
+
+      await _controller.runJavaScript(script);
+      print(
+        '✅ ABA data injected for user: ${profile.firstName} ${profile.lastName}',
+      );
+    } catch (e) {
+      print('❌ Error injecting ABA data: $e');
     }
   }
 

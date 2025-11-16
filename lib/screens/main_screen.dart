@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mini_app_viewer/home_screen.dart';
+import 'package:mini_app_viewer/screens/home_screen.dart';
 import 'package:mini_app_viewer/screens/settings_screen.dart';
 import 'package:mini_app_viewer/app_state.dart';
 import 'package:provider/provider.dart';
