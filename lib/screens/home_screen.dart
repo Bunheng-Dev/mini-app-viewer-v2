@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini_app_viewer/web_viewer.dart';
 import 'package:mini_app_viewer/app_state.dart';
-import 'package:mini_app_viewer/screens/history_screen.dart';
 import 'package:mini_app_viewer/widgets/mini_app_grid.dart';
 import 'package:provider/provider.dart';
 
@@ -30,36 +29,12 @@ class HomeScreen extends StatelessWidget {
                     centerTitle: true,
                     backgroundColor: Colors.white,
                     elevation: 0,
-                    actions: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.history,
-                            color: Color(0xFF448AFF),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HistoryScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                    bottomOpacity: 0,
                     bottom: PreferredSize(
-                      preferredSize: const Size.fromHeight(0.5),
+                      preferredSize: const Size.fromHeight(0.4),
                       child: Container(
                         color: Colors.grey.shade200,
-                        height: 0.5,
+                        height: 0.4,
                       ),
                     ),
                   )
@@ -77,10 +52,10 @@ class HomeScreen extends StatelessWidget {
                           Image.asset(
                             'assets/img/mini_app_banner.png',
                             width: double.infinity,
-                            height: 140,
+                            height: 150,
                             fit: BoxFit.cover,
                           ),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 30),
 
                           // Text(
                           //   'Select Mini App',
